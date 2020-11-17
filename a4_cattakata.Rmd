@@ -1,0 +1,31 @@
+---
+title: "Exploratory Report on Juvenile Snowshoe Hares in Bonanza Creek Experimental Forest"
+subtitle: "Assignment 4"
+author: "Catherine Takata"
+date: "11/17/2020"
+output: html_document
+---
+
+
+## Introduction 
+A 4 - 5 sentence "mini-introduction" to what this study is exploring, including basic background information about the subject, site and study (with citations as needed), and a brief overview of what is included in the exploratory report. You should probably do this last.
+
+
+```{r setup, include=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+library(effsize)
+library(broom)
+```
+
+
+#### Read in data 
+- Use clean_names() function to "tidy" data. This will change titles to lowercase for easier data wrangling. 
+```{r}
+bonanza_hares <- read.csv(here("data", "bonanza_hares.csv")) %>% 
+  clean_names()
+```
+
