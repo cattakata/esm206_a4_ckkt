@@ -650,7 +650,7 @@ ggplot(data = hare_counts, aes(x = year, y = n)) +
   group_by(sex) %&gt;% 
   filter(age == &quot;j&quot;) %&gt;% 
   summarize(mean = mean(weight, na.rm=TRUE),
-            sd = sd(weight, na.rm=TRUE ),
+            sd = sd(weight),
             sample = n())</code></pre>
 <pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre class="r"><code>kbl(jhares_by_sex) %&gt;% 
@@ -681,7 +681,7 @@ f
 855.3909
 </td>
 <td style="text-align:right;">
-292.2526
+NA
 </td>
 <td style="text-align:right;">
 200
@@ -709,7 +709,7 @@ NA
 614.5455
 </td>
 <td style="text-align:right;">
-357.5853
+NA
 </td>
 <td style="text-align:right;">
 15

@@ -70,11 +70,72 @@ jhares_by_sex <- bonanza_hares %>%
   group_by(sex) %>% 
   filter(age == "j") %>% 
   summarize(mean = mean(weight, na.rm=TRUE),
-            sd = sd(weight, na.rm=TRUE ),
+            sd = sd(weight, na.rm=TRUE),
             sample = n())
 
 kbl(jhares_by_sex) %>% 
   kable_styling() 
 ```
 
+
+```{r}
+juvenile_hares <- bonanza_hares %>% 
+  filter(age == "j")
+
+histogram 
+
+qqplot
+
+```
+
+
+## 2 Sample T-test 
+```{r}
+# Create vectors of for female and male hares based on weight. 
+
+weight_f <- bonanza_hares %>% 
+  filter(sex == "f") %>% 
+  pull(weight)
+
+weight_m <- bonanza_hares %>% 
+  filter(sex == "m") %>% 
+  pull(weight)
+
+# Inital 2 sample t test 
+hare_weight_ttest <- t.test(weight_f, weight_m)
+hare_weight_ttest
+```
+
+
+## Effect Size - Cohen's d
+```{r}
+cohen.d(weight_f, weight_m)
+```
+
+## Relationship between juvenile weight & hind foot length
+
+```{r}
+ggplot(data = juvenile_hares, aes(x = hindft, y = weight)) +
+  geom_point() + 
+  labs(title = "Juvenile Hares Hindfoot Length as a Function of Weight",
+       subtitle = "Bonanza Creek (Takata 2020)",
+       x = "Hind Foot Length (mm)",
+       y = "Weight (g)")
+```
+
+## Linear Regression
+```{r}
+# Linear model, stored as hare_lm:
+hare_lm <- lm(weight ~ hindft, data = juvenile_hares)
+
+#return the overview: 
+summary(hare_lm)
+```
+
+
+## Access model outputs
+We can use the broom::tidy() function to get the model outputs in nice data frame format:
+```{r}
+
+```
 
