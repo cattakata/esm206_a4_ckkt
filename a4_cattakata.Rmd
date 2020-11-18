@@ -15,17 +15,66 @@ A 4 - 5 sentence "mini-introduction" to what this study is exploring, including 
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
-library(janitor)
 library(lubridate)
 library(effsize)
 library(broom)
+library(kableExtra)
 ```
 
 
 #### Read in data 
-- Use clean_names() function to "tidy" data. This will change titles to lowercase for easier data wrangling. 
+
 ```{r}
-bonanza_hares <- read.csv(here("data", "bonanza_hares.csv")) %>% 
-  clean_names()
+bonanza_hares <- read.csv(here("data", "bonanza_hares.csv")) 
 ```
+
+```{r}
+# in a pipe sequence, change the initial date into a different format and use mutate() function to add this new "formatted" column to the data set
+# then mutate() a new column for specifically for year, in order to easily filter data 
+hares_by_year <- bonanza_hares %>% 
+  mutate(date_new = mdy(date)) %>% 
+  mutate(year = year(date_new))
+```
+
+
+## Exploratory Findings 
+
+```{r}
+hare_counts <- hares_by_year %>% 
+  count(age,year) %>% 
+  filter(age == "j")
+
+ggplot(data = hare_counts, aes(x = year, y = n)) + 
+  geom_col(alpha = 0.5) +
+  labs(title = "Number of Bonanza Hares per Year",
+       subtitle = "Bonanza Creek (Takata, 2020)",
+       x = "Year",
+       y = "Number of Hares")
+```
+
+## Visualize juvenile hare weights
+```{r}
+ggplot(data = bonanza_hares, aes(x = weight)) + 
+  geom_histogram(aes(fill = sex)) +
+  facet_wrap(~grid) + 
+  labs(title = "Number of Juvenile Hares by Sex Per Site by Weight",
+       subtitle = "Bonanza Creek (Takata 2020)",
+       x = "Weight (g)",
+       y = "Number of Hares")
+```
+
+## Table of Descriptive Statistics
+
+```{r}
+jhares_by_sex <- bonanza_hares %>% 
+  group_by(sex) %>% 
+  filter(age == "j") %>% 
+  summarize(mean = mean(weight, na.rm=TRUE),
+            sd = sd(weight, na.rm=TRUE ),
+            sample = n())
+
+kbl(jhares_by_sex) %>% 
+  kable_styling() 
+```
+
 
