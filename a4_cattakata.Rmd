@@ -1,34 +1,41 @@
 ---
-title: "Exploratory Report on Juvenile Snowshoe Hares in Bonanza Creek Experimental Forest"
-subtitle: "Assignment 4"
+title: "Juvenile Snowshoe Hares in Bonanza Creek Experimental Forest: Exploratory Report"
 author: "Catherine Takata"
-date: "11/17/2020"
+date: "20 Novemeber 2020"
 output: html_document
 ---
 
-
-## Introduction 
-A 4 - 5 sentence "mini-introduction" to what this study is exploring, including basic background information about the subject, site and study (with citations as needed), and a brief overview of what is included in the exploratory report. You should probably do this last.
-
-
-```{r setup, include=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(tidyverse)
 library(here)
 library(lubridate)
 library(effsize)
 library(broom)
 library(kableExtra)
+library(ggbeeswarm)
 ```
+
+
+### 1. Introduction 
+A 4 - 5 sentence "mini-introduction" to what this study is exploring, including basic background information about the subject, site and study (with citations as needed), and a brief overview of what is included in the exploratory report. You should probably do this last.
+
+
+### 2. Data and analyses
+A 3 - 4 sentence section in which you briefly describe the data, including citation & credit as needed, and provide an overview of the main analysis, statistical methods and tools used.
 
 
 #### Read in data 
-
-```{r}
-bonanza_hares <- read.csv(here("data", "bonanza_hares.csv")) 
+```{r, include=FALSE}
+bonanza_hares <- read.csv(here("data", "bonanza_hares.csv")) %>% 
+  mutate(site = case_when(
+    grid %in% "bonrip" ~ "Riparian",
+    grid %in% "bonmat" ~ "Mature",
+    grid %in% "bonbs" ~ "Lowland"
+  ))
 ```
 
-```{r}
+```{r, include=FALSE}
 # in a pipe sequence, change the initial date into a different format and use mutate() function to add this new "formatted" column to the data set
 # then mutate() a new column for specifically for year, in order to easily filter data 
 hares_by_year <- bonanza_hares %>% 
@@ -37,9 +44,9 @@ hares_by_year <- bonanza_hares %>%
 ```
 
 
-## Exploratory Findings 
+### 3. Preliminary Results 
 
-```{r}
+```{r, include=FALSE}
 hare_counts <- hares_by_year %>% 
   count(age,year) %>% 
   filter(age == "j")
@@ -52,40 +59,56 @@ ggplot(data = hare_counts, aes(x = year, y = n)) +
        y = "Number of Hares")
 ```
 
-## Visualize juvenile hare weights
-```{r}
-ggplot(data = bonanza_hares, aes(x = weight)) + 
-  geom_histogram(aes(fill = sex)) +
-  facet_wrap(~grid) + 
-  labs(title = "Number of Juvenile Hares by Sex Per Site by Weight",
-       subtitle = "Bonanza Creek (Takata 2020)",
-       x = "Weight (g)",
-       y = "Number of Hares")
-```
 
-## Table of Descriptive Statistics
-
-```{r}
-jhares_by_sex <- bonanza_hares %>% 
-  group_by(sex) %>% 
-  filter(age == "j") %>% 
-  summarize(mean = mean(weight, na.rm=TRUE),
-            sd = sd(weight, na.rm=TRUE),
-            sample = n())
-
-kbl(jhares_by_sex) %>% 
-  kable_styling() 
-```
-
-
+#### A. Weight based on sex comparison and descriptive statistics 
 ```{r}
 juvenile_hares <- bonanza_hares %>% 
   filter(age == "j")
 
-histogram 
 
-qqplot
+juvenile_hares_stats <- juvenile_hares %>% 
+  group_by(sex) %>% 
+  summarize(mean = mean(weight, na.rm = TRUE),
+            sd = sd(weight, na.rm = TRUE),
+            sample = n())
+```
 
+**Table 1.** Descriptive statistics (mean, standard deviation, and sample size) for recorded juvenile hare weight based on sex. Data: Kielland et al. (2017)
+```{r}
+juvenile_hares_stats %>% 
+  kbl(col.names = c("Sex", "Mean Weight (g)", "Standard Deviation (g)", "Sample Size")) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+
+```{r, fit.align = "center"}
+ggplot(data = juvenile_hares, aes(x = sex, y = weight)) +
+  geom_beeswarm(aes(color = sex)) +
+  scale_color_manual(values = c("goldenrod2","cyan4"), na.value ="coral") +
+  geom_boxplot(fill = NA, width = 0.2, outlier.color = NA) +
+  stat_summary(fun=mean, 
+               geom="point", 
+               shape=20, 
+               size=4, 
+               color="black", 
+               fill="black") +
+  theme_minimal() +
+  labs(x = "Sex",
+       y = "Weight (g)",
+       title = "Female and Male Juvenile Hare Weight",
+       subtitle = "Bonanza Creek, Alaksa, 1999-2012\n(Takata, 2020)",
+       caption = "Figure 1") + 
+  facet_wrap(~site)
+
+```
+
+**Figure 1.** Weight (g) observations of female and male juvenile Bonanza Snowshoe hares in three sampling areas: Lowland, Mature, and Riparian. Points correspond to indviidual hare weight observations: gold (female), cyan (male), and coral (N/A, in which sex could not be determined). Overlayed box plots endpoints indicate the variation of measurents from the 1st and 3rd quartiles; the black line and point indciate the median and mean value for each sex, respectively. Data: Data: Kielland et al. (2017)
+
+
+```{r, include = FALSE}
+
+#histogram 
+ggplot(data = )
 ```
 
 
@@ -109,7 +132,7 @@ hare_weight_ttest
 
 ## Effect Size - Cohen's d
 ```{r}
-cohen.d(weight_f, weight_m)
+cohen.d(weight_f, weight_m, na.rm = TRUE)
 ```
 
 ## Relationship between juvenile weight & hind foot length
