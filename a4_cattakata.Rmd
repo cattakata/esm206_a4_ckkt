@@ -18,7 +18,7 @@ library(ggbeeswarm)
 
 
 ### 1. Introduction 
-A 4 - 5 sentence "mini-introduction" to what this study is exploring, including basic background information about the subject, site and study (with citations as needed), and a brief overview of what is included in the exploratory report. You should probably do this last.
+In this exploratory report, based on the findings of "Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present," we identified differences and trends among observations on the Snowshoe hare of Bonanza Creek, Alaska, United States (Kielland et al. (2017). Female and male juvenile hare weights were compared and the relationship between weight and hind foot length was explored. Through data visualization, a series of test sampling, summary statistics, and regression calculation, this report provides an overview of a quanatative analysis of this keystone species. 
 
 
 ### 2. Data and analyses
@@ -95,8 +95,8 @@ ggplot(data = juvenile_hares, aes(x = sex, y = weight)) +
   theme_minimal() +
   labs(x = "Sex",
        y = "Weight (g)",
-       title = "Female and Male Juvenile Hare Weight",
-       subtitle = "Bonanza Creek, Alaksa, 1999-2012\n(Takata, 2020)",
+       title = "Distribution of Female and Male Juvenile Hare Weight",
+       subtitle = "Bonanza Creek, Alaska, US, 1999-2012\n(Takata, 2020)",
        caption = "Figure 1") + 
   facet_wrap(~site)
 
@@ -105,17 +105,8 @@ ggplot(data = juvenile_hares, aes(x = sex, y = weight)) +
 **Figure 1.** Weight (g) observations of female and male juvenile Bonanza Snowshoe hares in three sampling areas: Lowland, Mature, and Riparian. Points correspond to indviidual hare weight observations: gold (female), cyan (male), and coral (N/A, in which sex could not be determined). Overlayed box plots endpoints indicate the variation of measurents from the 1st and 3rd quartiles; the black line and point indciate the median and mean value for each sex, respectively. Data: Data: Kielland et al. (2017)
 
 
-```{r, include = FALSE}
-
-#histogram 
-ggplot(data = )
-```
-
-
-## 2 Sample T-test 
 ```{r}
 # Create vectors of for female and male hares based on weight. 
-
 weight_f <- bonanza_hares %>% 
   filter(sex == "f") %>% 
   pull(weight)
@@ -124,41 +115,82 @@ weight_m <- bonanza_hares %>%
   filter(sex == "m") %>% 
   pull(weight)
 
+# Plot histograms & qq-plots to check assumptions
+hist(weight_f)    # looks normal 
+qqnorm(weight_f)  # relatively linear 
+
+hist(weight_m)    # possibly negatively skewed 
+qqnorm(weight_m)  # relatively linear 
+
+
+# Overall: assumptions of normality hold, & sample size additionally >> Central Limit Theorem (means will be normally distributed). Two-sample t-test OK for means comparison! 
+
+
 # Inital 2 sample t test 
 hare_weight_ttest <- t.test(weight_f, weight_m)
 hare_weight_ttest
-```
 
-
-## Effect Size - Cohen's d
-```{r}
+# Get effect size
 cohen.d(weight_f, weight_m, na.rm = TRUE)
 ```
 
-## Relationship between juvenile weight & hind foot length
+
+
+
+#### B. Relationship between juvenile weight and hind foot length 
+```{r}
+# Obtain a linear regression 
+hare_lm <- lm(weight ~ hindft, data = juvenile_hares)
+
+# Get tidy versions of the model output to call later on in text
+hare_lm_tidy <- tidy(hare_lm)
+hare_lm_glance <- glance(hare_lm)
+
+# Plot and view model diagnostics:
+plot(hare_lm)
+
+# Calculate a Pearson's r correlation
+hare_cor <- cor.test(bonanza_hares$hindft, bonanza_hares$weight)
+
+# Tidy version of correlation output: 
+hare_cor_tidy <- tidy(hare_cor)
+
+```
+
 
 ```{r}
 ggplot(data = juvenile_hares, aes(x = hindft, y = weight)) +
-  geom_point() + 
-  labs(title = "Juvenile Hares Hindfoot Length as a Function of Weight",
-       subtitle = "Bonanza Creek (Takata 2020)",
-       x = "Hind Foot Length (mm)",
-       y = "Weight (g)")
+  geom_point(aes(color = sex, pch = sex), size = 2) +
+  scale_color_manual(values = c("goldenrod2","cyan4", "coral"), 
+                     name = "Sex") +
+  scale_shape_manual(values = c(16,17,18), 
+                     name = "Sex") +
+  geom_smooth(method = "lm", se = FALSE, color = "gray30") +
+  theme_minimal() +
+  labs(title = "Relationship of Juvenile Hare Weight and Hind Foot Length",
+       subtitle = "Bonanza Creek, Alaska, US",
+    x = "Hind Foot Length (mm)",
+       y = "Weight (g)") +
+  theme(legend.position = c(0.15, 0.7))
+```
 ```
 
-## Linear Regression
-```{r}
-# Linear model, stored as hare_lm:
-hare_lm <- lm(weight ~ hindft, data = juvenile_hares)
-
-#return the overview: 
-summary(hare_lm)
-```
 
 
-## Access model outputs
-We can use the broom::tidy() function to get the model outputs in nice data frame format:
-```{r}
 
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
