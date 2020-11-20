@@ -54,7 +54,7 @@ hares_by_year <- bonanza_hares %>%
 
 #### A. Annual juvenile hare trap counts 
 
-  In order to obtain a better understanding of the inital data set, a finalized figure (Figure 1) was created to incorpate counts of juvenile hares during each year of the study. Through this figure, inital frequency assumptions about the distirbution of female and male hares though sample period could be made. 
+  In order to obtain a better understanding of the inital data set, a finalized figure (Figure 1) was created to incorpate counts of juvenile hares during each year of the study. Through this figure, inital assumptions about the distirbution of trapped hares though sample period could be viewed. 
   
 
 ```{r}
@@ -66,7 +66,8 @@ hare_counts <- hares_by_year %>%
   count(age,year) %>% 
   filter(age == "j")  # Use filter() function to specify observations for filtering 
 
-# Create an initial exploratory graph of the amount of counts per year. Using ggplot() + geom_col() to create a bar graph, not a histogram. 
+# Create an initial exploratory graph of the amount of counts per year. 
+# Using ggplot() + geom_col() to create a bar graph, not a histogram. 
 
 ggplot(data = hare_counts, aes(x = year, y = n)) + 
   geom_col(aes(fill = "firebrick"), alpha = 0.5, show.legend = FALSE) +
@@ -81,11 +82,14 @@ ggplot(data = hare_counts, aes(x = year, y = n)) +
 **Figure 1.** The total number of juvenile Bonanza Snowshoe hares per year of the study (1999-2012). Data: Kielland et al. (2017)
 
 
-  In Figure 1, the data is postivley skewed, with the maximum amount of hares trapped at 126 in 1999 with a minimum of 2 hares in 2010. It is important to note that in 2002 and 2009, zero hares were "observed" and were not represented in the intial count. In regard to the metadata, a number of hares were actually recorded for those years but were unable to be identified and therefore not included. For the purpose of this report, the "zero" hares were not included in the counts or mean, to avoid skewed data, resulting in a mean calculation of 31.5 hares. Sex and sampling location were not included as variables but will be investigated moving forward.
+  In Figure 1, the data is postivley skewed, with the maximum amount of hares trapped at 126 in 1999 with a minimum of 2 hares in 2010. It is important to note that in 2002 and 2009, zero hares were "observed" and were not represented in the intial count. In regard to the metadata, a number of hares were actually recorded for those years but were unable to be identified and therefore not included. For the purpose of this report, the "zero" hares were not included in the counts or mean, to avoid skewed data, resulting in a mean of 31.5 hares and a median of 18.3. Sex and sampling location were not included as variables but will be investigated moving forward. Indicating days of capture in the month per year of the study would also prove useful in consdiering the standarization of the juvenile hare population. 
 
 
 
 #### B. Juvenile female and male hare weights 
+
+   With an inital understanding of the number of hares per year, it would be important to incorporate other parameters to find any new relationships. A finalized figure (Figure 2) was created to consider sex and sampling locations. Through this figure, inital frequency assumptions about the distirbution of female and male hares through each field site could be made. 
+
 
 ```{r, fit.align = "center"}
 
@@ -122,7 +126,7 @@ ggplot(data = juvenile_hares, aes(x = sex, y = weight)) +
 **Figure 2.** Weight (g) observations of female and male juvenile Bonanza Snowshoe hares in three sampling areas: Lowland, Mature, and Riparian. Points correspond to indviidual hare weight observations: gold (female), cyan (male), and coral (N/A, in which sex could not be determined). Overlayed box plots endpoints indicate the variation of measurents from the 1st and 3rd quartiles; the black line and point indciate the median and mean value for each sex, respectively. Data: Kielland et al. (2017)
 
 
-  The figure reveals a wide distribution of observations in both the Lowland and Mature sampling sites, with the Riparian site with more frequent, centrally located data. Female and male groupings are not consistent through the sampling sites; the groups vary in their central tendency. Of the different areas, the Riparian environemnt has a relativly normal, symmetric distribution with mean and median values similar. Both the female and male hares of the the Riparian sampling site, seem to display equal normalcy, with neither group more skewed than the other.  
+  The figure reveals a wide distribution of observations in both the Lowland and Mature sampling sites, with the Riparian site with more frequent, centrally located data. The Lowland has an overall higher mean and median than the other two locations. Of the different areas, the Riparian environment has a relativly normal, symmetric distribution with similar mean and median values. Both the female and male hares of the the Riparian sampling site, seem to display equal normalcy, with neither group more skewed than the other.Female and male groupings are not consistent through the sampling sites; the groups vary in their central tendency with a large spread in frequency of observations.
 
 
 #### C. Juvenile Female and Male Weight Comparison and Descriptive Statistics
@@ -149,7 +153,7 @@ juvenile_hares_stats %>%
 
 Weights (g) of the snowshoe hares were compared across female and male groupings. Male hares had a greater mean weight of 945.8589 +/- 333.2151 g, n = 163 with femles hares averaging 855.3909 +/- 292.2526 g when n = 200.
 
-To determine the probability of the uncertantity of the means between the sexes, a two sample t-test was performed.We calculated a p-value of 0.3923. From the p-value we can determine that, there is a 39% chance that these two samples come from the same population with at least a 11.317 mean difference. This higher p-value indcates less evidence of differences between the population means. 
+To determine the probability of the uncertainty of the means between the sexes, a two sample t-test was performed. We calculated a t value of 0.85568 and p-value of 0.3923. From the p-value we can determine that, there is a 39% chance that these two samples come from the same population with at least a 11.317 mean difference. This higher p-value indcates less evidence of differences between the population means. 
 
 The Cohen's *d test revealed a 0.03389279 effect size, < 0.2, indicating a small size of differnce in the amount of standard deviations apart from the female and male weight means. 
 
@@ -159,6 +163,7 @@ The Cohen's *d test revealed a 0.03389279 effect size, < 0.2, indicating a small
 
 # Create vectors of for female and male hares based on weight. 
 # These vectos are necessary to call later for different tests. R needs these vectors as a value in order to perform the calculations. 
+
 weight_f <- bonanza_hares %>% 
   filter(sex == "f") %>% 
   pull(weight)
@@ -178,7 +183,7 @@ qqnorm(weight_m)  # relatively linear
 # Overall: assumptions of normality hold, & sample size additionally >> Central Limit Theorem (means will be normally distributed). Two-sample t-test OK for means comparison! 
 
 
-# Inital 2 sample t test 
+# Initial 2 sample t test 
 hare_weight_ttest <- t.test(weight_f, weight_m)
 hare_weight_ttest
 
@@ -189,7 +194,12 @@ cohen.d(weight_f, weight_m, na.rm = TRUE)
 
 #### D. Relationship between juvenile weight and hind foot length 
 
+To further explore the data set, the relationship between weight (g) and hind foot lenght (mm) was explored across the sexes; further analysis, through visualization and testing is needed to compare the relationship between these two obsercations within the data set. 
+
+
+
 ```{r, include=FALSE}
+
 # Obtain a linear regression 
 hare_lm <- lm(weight ~ hindft, data = juvenile_hares)
 
@@ -201,7 +211,7 @@ hare_lm_glance <- glance(hare_lm)
 plot(hare_lm)
 
 # Calculate a Pearson's r correlation
-# Eexplore the strength of the correlation (degree of relationship) between two variables which, for two linearly related continuous variables, can be expressed using Pearson’s r.
+# Explore the strength of the correlation (degree of relationship) between two variables which, for two linearly related continuous variables, can be expressed using Pearson’s r.
 hare_cor <- cor.test(bonanza_hares$hindft, bonanza_hares$weight) 
 # The cor() function reports the Pearson’s r value, and performs a hypothesis test with null hypothesis that the correlation = 0.
 
@@ -222,25 +232,47 @@ ggplot(data = juvenile_hares, aes(x = hindft, y = weight)) +
 
 
 ```{r}
-# Use Simple linear regression model to to explore the relationship between hare weight (g) and hind foot length (mm). 
+
+# Use simple linear regression model to to explore the relationship between hare weight (g) and hind foot length (mm). 
 
 ggplot(data = juvenile_hares, aes(x = hindft, y = weight)) +
-  geom_point(aes(color = sex, pch = sex), size = 2) +
-  scale_color_manual(values = c("goldenrod2","cyan4", "coral"), 
-                     name = "Sex") +
-  scale_shape_manual(values = c(16,17,18), 
-                     name = "Sex") +
-  geom_smooth(method = "lm", se = FALSE, color = "black") + # Use geom_smooth(method = "lm") to add a linear model to an existing scatterplot
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") + # Use geom_smooth(method = "lm") to add a linear model to an existing scatterplot
   theme_minimal() +
   labs(title = "Relationship of Juvenile Hare Weight and Hind Foot Length",
        subtitle = "Bonanza Creek, Alaska, US",
-    x = "Hind Foot Length (mm)",
+       caption = "Figure 3",
+       x = "Hind Foot Length (mm)",
        y = "Weight (g)") +
   theme(legend.position = c(0.15, 0.7))
 ```
-```
+
+**Figure 3.** Relationship between hind foot length (mm) and weight (g) for female and male juvenile hares. Points indicate individual hare observations (female = gold circles; male = teal triangles; N/A = coral diamonds). Linear model summary: Linear model summary: $\beta$~1~ = `r round(hare_lm_tidy$estimate[2], 2)` g mm^-1^, p < 0.001, R^2^ = `r round(hare_lm_glance$r.squared,2)`, Pearson's *r* = `r round(hare_cor_tidy$estimate,2)`). Data: Kielland et al. (2017).
 
 
+The relationship between penguin hind foot length and weight appears relatively linear, across the sexes (Figure 3). Simple linear regression revealed that hind foot length significantly predicts penguin body mass (p < 0.001, R^2^ = `r round(hare_lm_glance$r.squared,2)`) with an average slope of $\beta$ = `r round(hare_lm_tidy$estimate[2], 2)` g mm^-1^ (i.e., for each one millimeter increase in hind foot length we expect an average increase in weight of `r round(hare_lm_tidy$estimate[2], 2)` g). Hind foot length and weight are moderatley, positively correlated (Pearson's *r* = `r round(hare_cor_tidy$estimate,2)`, p < 0.001). Diagnostic plots (not included) reveal normally distributed and homoscedastic residuals. 
+
+
+### Summary  
+
+Exploratory data analysis reveals the following inital findings: 
+
+- Of the three sampling sites, the Lowland (noted as bonbs in the metadata) had significantly higher means and median values. 
+
+- Male hares weighh more than female hares across the sampling sites (the difference is significant, the effect size is small).
+
+- Hind foot length is significantly related to weight of the juvenile hares (by simple regression) with a moderate correlation: slope (expected average increase in hind foot length with a 1 g increase in weight) of `r round(hare_lm_tidy$estimate[2], 2)` g mm^-1^.)
+
+Next steps: 
+
+- Incorporate the number of days of hare capture during the study period to standardize the juvenile population. 
+
+- Multiple regression to understand relationship between sex and study sample site. 
+
+
+
+### Citation 
+Kielland, K., F.S. Chapin, R.W. Ruess, and Bonanza Creek LTER. 2017. Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22. Environmental Data Initiative. https://doi.org/10.6073/pasta/03dce4856d79b91557d8e6ce2cbcdc14
 
 
 
